@@ -137,8 +137,26 @@ var cumulativeOffset = function(element) {
 //------------------------------------------
 //
 //------------------------------------------
+
+function  findFilesDir(dir, result) {
+	fs = require('fs');
+
+	var contents = fs.readdirSync(dir);
+	
+	for(var t = 0; t < contents.length; ++t) {
+		var path = dir + "/" +  contents[t];
+		var isDirectory = fs.lstatSync(path).isDirectory();	
+		if(!isDirectory) result.push(path);
+		else findFilesDir(path, result);
+	}
+}
+
 function onPageReady( )
 {
+	
+	var files2display = new Array();
+	findFilesDir("./songs/", files2display);
+
 	g_mouseX = 0;
 	g_mouseY = 0;
 	
@@ -146,12 +164,11 @@ function onPageReady( )
 		g_mouseX = e.pageX;
 		g_mouseY = e.pageY;
 	}
-	
-	
+
 	//shuffle = OnOffCtrl(document.getElementById("Shuffle"), "onOffShuffle", "Shuffle");
 	//repreat = OnOffCtrl(document.getElementById("Repeat"), "onOffRepeat", "Repeat");
 	//gergana = OnOffCtrl(document.getElementById("gergana"), "onOffRepeat", "gergana");
-	CreateFileListControl(document.getElementById("container"), "availableSongs", ["hadele-nogota obi4am", "Cradle of Filth - Bathory aria"]);
+	CreateFileListControl(document.getElementById("container"), "availableSongs", files2display);
 	CreateScroller(document.getElementById("soundScroll"), "soundControl");
 	CreateScroller(document.getElementById("soundScroll2"), "soundControl2");
 }
@@ -167,6 +184,6 @@ function onPageReady( )
 </br>
 
 <div id = "soundScroll2" style="position: absolute; left: 100px"></div>
-
+<input type="range"></input>
 </body>
 </html>
