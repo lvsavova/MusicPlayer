@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MusicPlayer</title>
+	<link rel="stylesheet" type="text/css" href="ui_elements.css">
+</head>
+
+<script>
+//------------------------------------------
+//
+//------------------------------------------
+function OnOffCtrl(parent, id, text)
+{
+	var ctrl = document.createElement("span");
+	parent.appendChild(ctrl);
+
+	ctrl.innerText = text;	
+	
+	//...
+	fileNameCtrl
+	fileNameCtrl.owner = ctrl;
+
+	
+	ctrl.SetOn = function(isOn)
+	{
+		this.isOn = isOn;
+		if(this.isOn) this.className = "OnOffCtrlStyle_On";
+		else this.className = "OnOffCtrlStyle_Off";
+	}
+	
+	ctrl.onclick = function()
+	{
+		this.SetOn(!this.isOn);
+	}
+
+	ctrl.SetOn(false);
+	
+	return ctrl;
+}
+
+//------------------------------------------
+//
+//------------------------------------------
+function CreateFileListControl(parent, id, fileList)
+{
+	var ctrl = document.createElement("span");
+	parent.appendChild(ctrl);
+	
+	for(var i = 0; i < fileList.length; ++i)
+	{
+		fileName = fileList[i];
+		
+		
+		var div_file = document.createElement("div");
+		ctrl.appendChild(div_file);
+		
+		div_file.innerText = fileName;
+		div_file.owner = ctrl;
+		
+		div_file.className = "fileListElementStyle";
+		div_file.onclick = function()
+		{
+			this.owner.InformFileClicked(this);
+		}
+		
+	}
+	
+	ctrl.currentlyClickedElement = null;
+	
+	ctrl.InformFileClicked = function(elem)
+	{
+		if(elem != this.currentlyClickedElement)
+		{	
+
+			if(this.currentlyClickedElement)
+				this.currentlyClickedElement.className = "fileListElementStyle";
+
+			if(elem)
+				elem.className = "fileListElementClicked";
+
+			this.currentlyClickedElement = elem;
+
+		}
+	}
+	
+	return ctrl;
+}
+
+function CreateScroller(parent, id)
+{
+	var ctrl = document.createElement("span");
+	parent.appendChild(ctrl);
+	
+	var background = document.createElement("span");
+	background.className = "soundScrollerContainer";
+	ctrl.appendChild(background);
+	
+	var buttonScroll = document.createElement("span");
+	buttonScroll.className = "buttonScroller";
+    ctrl.appendChild(buttonScroll);
+	buttonScroll.isMoveActive = false;
+	
+	buttonScroll.onmousedown = function()
+	{
+		this.isMoveActive = true;
+		
+		scrollMove = function()
+		{
+			var globalOffset = cumulativeOffset(background);
+			buttonScroll.style.left = (g_mouseX - globalOffset.left) + "px";			
+		}
+		
+		 intervalid = setInterval(scrollMove, 30);
+		 
+		 document.onmouseup = function() { 
+			closeInterval(intervalid);
+		}
+	}
+	
+	return ctrl;
+}
+
+var cumulativeOffset = function(element) {
+    var top = 0, left = 0;
+    do {
+        top += element.offsetTop  || 0;
+        left += element.offsetLeft || 0;
+        element = element.offsetParent;
+    } while(element);
+
+    return {
+        top: top,
+        left: left
+    };
+};
+
+//------------------------------------------
+//
+//------------------------------------------
+function onPageReady( )
+{
+	g_mouseX = 0;
+	g_mouseY = 0;
+	
+	document.body.onmousemove = function(e) {
+		g_mouseX = e.pageX;
+		g_mouseY = e.pageY;
+	}
+	
+	
+	//shuffle = OnOffCtrl(document.getElementById("Shuffle"), "onOffShuffle", "Shuffle");
+	//repreat = OnOffCtrl(document.getElementById("Repeat"), "onOffRepeat", "Repeat");
+	//gergana = OnOffCtrl(document.getElementById("gergana"), "onOffRepeat", "gergana");
+	CreateFileListControl(document.getElementById("container"), "availableSongs", ["hadele-nogota obi4am", "Cradle of Filth - Bathory aria"]);
+	CreateScroller(document.getElementById("soundScroll"), "soundControl");
+	CreateScroller(document.getElementById("soundScroll2"), "soundControl2");
+}
+</script>
+
+<body onLoad="onPageReady()">
+
+<span id = "Repeat"></span>
+<span id = "Shuffle"></span>
+<span id = "gergana"></span>
+<div id = "container" style="width: 300px; display: block;"></div>
+<div id = "soundScroll" style="position: relative"></div>
+</br>
+
+<div id = "soundScroll2" style="position: absolute; left: 100px"></div>
+
+</body>
+</html>

@@ -1,0 +1,77 @@
+.OnOffCtrlStyle_On
+{
+	cursor: pointer;
+	-webkit-user-select: none; 
+	border-radius: 12px; 
+	border-style: solid; 
+	border-width: 3px;
+	background-color: #00AAFF; 	
+	border-color: #33CCFF;
+}
+
+.fileListElementStyle
+{
+	background-color: #81DAF7;
+}
+
+.fileListElementClicked
+{
+	background-color: #81DAF7;
+	border-style: solid;
+	border-color: #6FBED9;
+	border-width: 2px;
+}
+
+.OnOffCtrlStyle_Off
+{
+	cursor: pointer;
+	-webkit-user-select: none; 
+	border-radius: 12px; 
+	border-style: solid; 
+	border-width: 3px; 
+	background-color: #FF3300; 
+	border-color: #FFCC33;
+}
+
+@-webkit-keyframes OnOffBall_ToOn_Frames
+{
+	0% { background-color: #00AAFF; left: 0%; }
+	100% { background-color: #FF3300; left: 100%; }
+}
+
+@keyframes OnOffBall_ToOn_Frames
+{
+	0% { background-color: #00AAFF; left: 0px; }
+	100% { background-color: #FF3300; left: 100%; }
+}
+
+.OnOffBallStyle
+{
+	width : 30px;
+	height : 30px;
+	top: 0px;
+	position: relative;
+	
+	animation-name: OnOffBall_ToOn_Frames;
+	animation-duration: 4.4s;
+	-webkit-animation-name: OnOffBall_ToOn_Frames;
+    -webkit-animation-duration:  4.4s;
+}
+
+.soundScrollerContainer
+{	
+	position: absolute;
+	top: 0;
+	width : 100px;
+	height : 15px;
+	background-color: #B1BABD;	
+}
+
+.buttonScroller
+{
+	position: absolute;
+	top: 0;
+	width : 15px;
+	height : 15px;
+	background-color: #00AAFF;
+}
