@@ -102,7 +102,7 @@ function  findFilesDir(dir, result) {
 	var contents = fs.readdirSync(dir);
 	
 	for(var t = 0; t < contents.length; ++t) {
-		var path = dir + contents[t];
+		var path = dir + "/" + contents[t];
 		var isDirectory = fs.lstatSync(path).isDirectory();	
 		if(!isDirectory) result.push(path);
 		else findFilesDir(path, result);
