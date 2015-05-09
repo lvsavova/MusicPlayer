@@ -6,6 +6,8 @@
 </head>
 
 <script>
+var g_player = null;	
+
 //------------------------------------------
 //
 //------------------------------------------
@@ -81,58 +83,14 @@ function CreateFileListControl(parent, id, fileList)
 			this.currentlyClickedElement = elem;
 
 		}
+		
+		if(this.onSelectionChanged) this.onSelectionChanged(elem.innerHTML);
+		
 	}
 	
 	return ctrl;
 }
 
-function CreateScroller(parent, id)
-{
-	var ctrl = document.createElement("span");
-	parent.appendChild(ctrl);
-	
-	var background = document.createElement("span");
-	background.className = "soundScrollerContainer";
-	ctrl.appendChild(background);
-	
-	var buttonScroll = document.createElement("span");
-	buttonScroll.className = "buttonScroller";
-    ctrl.appendChild(buttonScroll);
-	buttonScroll.isMoveActive = false;
-	
-	buttonScroll.onmousedown = function()
-	{
-		this.isMoveActive = true;
-		
-		scrollMove = function()
-		{
-			var globalOffset = cumulativeOffset(background);
-			buttonScroll.style.left = (g_mouseX - globalOffset.left) + "px";			
-		}
-		
-		 intervalid = setInterval(scrollMove, 30);
-		 
-		 document.onmouseup = function() { 
-			closeInterval(intervalid);
-		}
-	}
-	
-	return ctrl;
-}
-
-var cumulativeOffset = function(element) {
-    var top = 0, left = 0;
-    do {
-        top += element.offsetTop  || 0;
-        left += element.offsetLeft || 0;
-        element = element.offsetParent;
-    } while(element);
-
-    return {
-        top: top,
-        left: left
-    };
-};
 
 //------------------------------------------
 //
@@ -144,7 +102,7 @@ function  findFilesDir(dir, result) {
 	var contents = fs.readdirSync(dir);
 	
 	for(var t = 0; t < contents.length; ++t) {
-		var path = dir + "/" +  contents[t];
+		var path = dir + contents[t];
 		var isDirectory = fs.lstatSync(path).isDirectory();	
 		if(!isDirectory) result.push(path);
 		else findFilesDir(path, result);
@@ -153,28 +111,27 @@ function  findFilesDir(dir, result) {
 
 function onPageReady( )
 {
-	
 	var files2display = new Array();
 	findFilesDir("./songs/", files2display);
-
-	g_mouseX = 0;
-	g_mouseY = 0;
 	
-	document.body.onmousemove = function(e) {
-		g_mouseX = e.pageX;
-		g_mouseY = e.pageY;
+	var ctrl = CreateFileListControl(document.getElementById("container"), "availableSongs", files2display);
+	g_player = new Player();
+	
+	ctrl.onSelectionChanged = function(elem) {
+		var audio = document.getElementById("audiotag_player");
+		audio.setAttribute("src", elem);
+		audio.play();
 	}
-
-	//shuffle = OnOffCtrl(document.getElementById("Shuffle"), "onOffShuffle", "Shuffle");
-	//repreat = OnOffCtrl(document.getElementById("Repeat"), "onOffRepeat", "Repeat");
-	//gergana = OnOffCtrl(document.getElementById("gergana"), "onOffRepeat", "gergana");
-	CreateFileListControl(document.getElementById("container"), "availableSongs", files2display);
-	CreateScroller(document.getElementById("soundScroll"), "soundControl");
-	CreateScroller(document.getElementById("soundScroll2"), "soundControl2");
 }
 </script>
 
+<script type="text/javascript" src="audiocontext.js"></script>
+
 <body onLoad="onPageReady()">
+
+
+<audio id="audiotag_player" controls>
+</audio>
 
 <span id = "Repeat"></span>
 <span id = "Shuffle"></span>
@@ -184,6 +141,7 @@ function onPageReady( )
 </br>
 
 <div id = "soundScroll2" style="position: absolute; left: 100px"></div>
-<input type="range"></input>
+
+	
 </body>
 </html>
