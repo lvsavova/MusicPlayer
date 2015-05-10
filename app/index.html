@@ -43,50 +43,95 @@ function OnOffCtrl(parent, id, text)
 //------------------------------------------
 //
 //------------------------------------------
-function CreateFileListControl(parent, id, fileList)
+function CreateFileListControl(parent, id)
 {
 	var ctrl = document.createElement("span");
 	parent.appendChild(ctrl);
 	
-	for(var i = 0; i < fileList.length; ++i)
+	ctrl.addElement = function(name, userData)
 	{
-		fileName = fileList[i];
-		
-		
 		var div_file = document.createElement("div");
-		ctrl.appendChild(div_file);
+		this.appendChild(div_file);
 		
-		div_file.innerText = fileName;
+		div_file.innerText = name;
+		div_file.userData = userData;
 		div_file.owner = ctrl;
 		
 		div_file.className = "fileListElementStyle";
-		div_file.onclick = function()
-		{
-			this.owner.InformFileClicked(this);
+		div_file.onclick = function() {
+			this.owner.setSelection(this);
 		}
-		
-	}
+	};
 	
-	ctrl.currentlyClickedElement = null;
-	
-	ctrl.InformFileClicked = function(elem)
+	ctrl.addHeader = function(name)
 	{
-		if(elem != this.currentlyClickedElement)
+		var div_header = document.createElement("div");
+		this.appendChild(div_header);
+		
+		div_header.innerText = name;
+		div_header.owner = ctrl;
+		div_header.className = "fileListHeaderStyle";
+	};
+	
+	// Clears all elements (headers and files), leaving the control empty.
+	ctrl.clearAll = function()
+	{
+		this.innerHTML = "";
+	};
+	
+	// Explores a directory and creates elements in the same hierarchy.
+	ctrl.exploreDirectory = function(dir) {
+		
+		// Clear the current state.
+		this.clearAll();
+		this.exploreDirectoryRecursive(dir);
+	}
+	
+	ctrl.exploreDirectoryRecursive = function(dir) {
+		var fs = require('fs');
+
+		// Recursively explore the directory tree.
+		var contents = fs.readdirSync(dir);
+	
+		for(var t = 0; t < contents.length; ++t) {
+			var fileName =  contents[t];
+			var path = dir + "/" + fileName;
+			
+			var isDirectory = fs.lstatSync(path).isDirectory();	
+			if(isDirectory)
+			{
+				this.addHeader(path);
+				this.exploreDirectoryRecursive(path);
+			}
+			else
+			{
+				// the userdata (second arg) in the full path to the file.
+				this.addElement(fileName, path);
+			}
+		}
+	};
+	
+	// Handles the element selection.
+	ctrl.currentlySelectedElem = null; // By default nothing is selected.
+	
+	// Updates the currently selected element. 
+	// @elem - the html element being selected.
+	ctrl.setSelection = function(elem)
+	{
+		if(elem != this.currentlySelectedElem)
 		{	
-
-			if(this.currentlyClickedElement)
-				this.currentlyClickedElement.className = "fileListElementStyle";
-
-			if(elem)
-				elem.className = "fileListElementClicked";
-
-			this.currentlyClickedElement = elem;
-
+			// Update the style of the old and the new selected elements.
+			if(this.currentlySelectedElem) this.currentlySelectedElem.className = "fileListElementStyle";
+			if(elem) elem.className = "fileListElementClicked";
+			
+			// Cache the currently selected element.
+			this.currentlySelectedElem = elem;
+			
+			// Invoke the user callback when the selectiong is changed.
+			if(this.onSelectionChanged) this.onSelectionChanged(elem);
 		}
 		
-		if(this.onSelectionChanged) this.onSelectionChanged(elem.innerHTML);
-		
-	}
+	};
 	
 	return ctrl;
 }
@@ -114,12 +159,12 @@ function onPageReady( )
 	var files2display = new Array();
 	findFilesDir("./songs/", files2display);
 	
-	var ctrl = CreateFileListControl(document.getElementById("container"), "availableSongs", files2display);
-	g_player = new Player();
+	var ctrl = CreateFileListControl(document.getElementById("container"), "availableSongs");
+	ctrl.exploreDirectory("D:/Music/");
 	
 	ctrl.onSelectionChanged = function(elem) {
 		var audio = document.getElementById("audiotag_player");
-		audio.setAttribute("src", elem);
+		audio.setAttribute("src", elem.userData);
 		audio.play();
 	}
 }
