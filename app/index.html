@@ -11,38 +11,6 @@ var g_player = null;
 //------------------------------------------
 //
 //------------------------------------------
-function OnOffCtrl(parent, id, text)
-{
-	var ctrl = document.createElement("span");
-	parent.appendChild(ctrl);
-
-	ctrl.innerText = text;	
-	
-	//...
-	fileNameCtrl
-	fileNameCtrl.owner = ctrl;
-
-	
-	ctrl.SetOn = function(isOn)
-	{
-		this.isOn = isOn;
-		if(this.isOn) this.className = "OnOffCtrlStyle_On";
-		else this.className = "OnOffCtrlStyle_Off";
-	}
-	
-	ctrl.onclick = function()
-	{
-		this.SetOn(!this.isOn);
-	}
-
-	ctrl.SetOn(false);
-	
-	return ctrl;
-}
-
-//------------------------------------------
-//
-//------------------------------------------
 function CreateFileListControl(parent, id)
 {
 	var ctrl = document.createElement("span");
@@ -140,25 +108,8 @@ function CreateFileListControl(parent, id)
 //------------------------------------------
 //
 //------------------------------------------
-
-function  findFilesDir(dir, result) {
-	fs = require('fs');
-
-	var contents = fs.readdirSync(dir);
-	
-	for(var t = 0; t < contents.length; ++t) {
-		var path = dir + "/" + contents[t];
-		var isDirectory = fs.lstatSync(path).isDirectory();	
-		if(!isDirectory) result.push(path);
-		else findFilesDir(path, result);
-	}
-}
-
 function onPageReady( )
-{
-	var files2display = new Array();
-	findFilesDir("./songs/", files2display);
-	
+{	
 	var ctrl = CreateFileListControl(document.getElementById("container"), "availableSongs");
 	ctrl.exploreDirectory("D:/Music/");
 	
@@ -170,23 +121,10 @@ function onPageReady( )
 }
 </script>
 
-<script type="text/javascript" src="audiocontext.js"></script>
-
 <body onLoad="onPageReady()">
 
-
-<audio id="audiotag_player" controls>
-</audio>
-
-<span id = "Repeat"></span>
-<span id = "Shuffle"></span>
-<span id = "gergana"></span>
+<audio id="audiotag_player" controls></audio>
 <div id = "container" style="width: 300px; display: block;"></div>
-<div id = "soundScroll" style="position: relative"></div>
-</br>
 
-<div id = "soundScroll2" style="position: absolute; left: 100px"></div>
-
-	
 </body>
 </html>
