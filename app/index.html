@@ -5,15 +5,14 @@
 	<link rel="stylesheet" type="text/css" href="ui_elements.css">
 </head>
 
-<script>
-var g_player = null;	
+<script>	
 
 //------------------------------------------
 //
 //------------------------------------------
-function CreateFileListControl(parent, id)
+function CreateFileListControl(parent)
 {
-	var ctrl = document.createElement("span");
+	var ctrl = document.createElement("div");
 	parent.appendChild(ctrl);
 	
 	ctrl.addElement = function(name, userData)
@@ -23,7 +22,7 @@ function CreateFileListControl(parent, id)
 		
 		div_file.innerText = name;
 		div_file.userData = userData;
-		div_file.owner = ctrl;
+		div_file.owner = this;
 		
 		div_file.className = "fileListElementStyle";
 		div_file.onclick = function() {
@@ -37,7 +36,7 @@ function CreateFileListControl(parent, id)
 		this.appendChild(div_header);
 		
 		div_header.innerText = name;
-		div_header.owner = ctrl;
+		div_header.owner = this;
 		div_header.className = "fileListHeaderStyle";
 	};
 	
@@ -89,14 +88,14 @@ function CreateFileListControl(parent, id)
 		if(elem != this.currentlySelectedElem)
 		{	
 			// Update the style of the old and the new selected elements.
-			if(this.currentlySelectedElem) this.currentlySelectedElem.className = "fileListElementStyle";
-			if(elem) elem.className = "fileListElementClicked";
+			if(this.currentlySelectedElem != null) this.currentlySelectedElem.className = "fileListElementStyle";
+			if(elem != null) elem.className = "fileListElementClicked";
 			
 			// Cache the currently selected element.
 			this.currentlySelectedElem = elem;
 			
-			// Invoke the user callback when the selectiong is changed.
-			if(this.onSelectionChanged) this.onSelectionChanged(elem);
+			// Invoke the user callback(if any) when the selectiong is changed.
+			if(this.onSelectionChanged != null) this.onSelectionChanged(elem);
 		}
 		
 	};
@@ -110,8 +109,8 @@ function CreateFileListControl(parent, id)
 //------------------------------------------
 function onPageReady( )
 {	
-	var ctrl = CreateFileListControl(document.getElementById("container"), "availableSongs");
-	ctrl.exploreDirectory("D:/Music/");
+	var ctrl = CreateFileListControl(document.getElementById("container"));
+	ctrl.exploreDirectory("./songs");
 	
 	ctrl.onSelectionChanged = function(elem) {
 		var audio = document.getElementById("audiotag_player");
